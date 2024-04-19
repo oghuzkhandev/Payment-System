@@ -60,40 +60,4 @@ router.post('/login', async (req, res) => {
     }
 });
 
-/**
- * @openapi
- * /private:
- *   get:
- *     summary: Token ile korunan özel bir veriye erişim sağlar.
- *     tags:
- *       - Auth
- *     security:
- *       - bearerAuth: string
- *     responses:
- *       200:
- *         description: Özel veriye erişim sağlandı.
- *       401:
- *         description: Token sağlanmadı veya geçersiz.
- */
-router.get('/private', authenticateToken, (req, res) => {
-    res.json({ message: 'Bu gizli veri sadece oturum açmış kullanıcılara gösterilir.' });
-});
-
-// Token doğrulama fonksiyonu
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
-
-    if (!token){
-        return res.sendStatus(401); // Token yoksa 401 gönder
-    }
-    jwt.verify(token, secretKey, (err, user) => {
-        if (err) {
-            return res.status(403).json({ error: 'Invalid token.' });
-        }
-        req.user = user;
-        next();
-    });
-}
-
 module.exports = router;
